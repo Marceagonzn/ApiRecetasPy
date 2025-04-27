@@ -8,9 +8,8 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-// Base de datos simple de recetas (Paraguayas e internacionales)
+// Base de datos simple de recetas paraguayas
 const recetas = [
-  // Recetas paraguayas
   {
     id: 1,
     nombre: "Sopa Paraguaya",
@@ -26,8 +25,7 @@ const recetas = [
     preparacion: "Batir los huevos, agregar la harina de maíz, queso rallado, leche, cebolla rehogada en manteca y sal. Mezclar todo y hornear a temperatura media hasta dorar.",
     tiempo: "1 hora",
     dificultad: "Fácil",
-    imagen: "https://cdn0.recetasparaguayas.com/wp-content/uploads/2020/04/Sopa-paraguaya-receta.jpg",
-    pais: "Paraguay"
+    imagen: "https://cdn0.recetasparaguayas.com/wp-content/uploads/2020/04/Sopa-paraguaya-receta.jpg"
   },
   {
     id: 2,
@@ -43,74 +41,136 @@ const recetas = [
     preparacion: "Mezclar todos los ingredientes hasta formar una masa suave. Formar roscas y hornear hasta que estén doradas.",
     tiempo: "45 minutos",
     dificultad: "Fácil",
-    imagen: "https://www.turismo.gov.py/wp-content/uploads/2020/03/chipa.png",
-    pais: "Paraguay"
+    imagen: "https://www.turismo.gov.py/wp-content/uploads/2020/03/chipa.png"
   },
-  // Recetas internacionales
   {
     id: 3,
-    nombre: "Pizza Margherita",
+    nombre: "Mbejú",
     ingredientes: [
-      "Masa de pizza",
-      "Salsa de tomate",
-      "Queso mozzarella",
-      "Hojas de albahaca",
-      "Aceite de oliva"
+      "Almidón de mandioca",
+      "Queso paraguay",
+      "Grasa de cerdo o manteca",
+      "Sal"
     ],
-    preparacion: "Estirar la masa de pizza, cubrir con salsa de tomate, agregar queso mozzarella y albahaca. Hornear hasta que el queso se derrita.",
+    preparacion: "Mezclar el almidón, queso, grasa y sal hasta formar una mezcla arenosa. Cocinar en sartén caliente formando una tortilla.",
     tiempo: "30 minutos",
-    dificultad: "Media",
-    imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Pizza_Margherita_1.jpg/500px-Pizza_Margherita_1.jpg",
-    pais: "Italia"
+    dificultad: "Fácil",
+    imagen: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Mbeju.png"
   },
   {
     id: 4,
-    nombre: "Sushi",
+    nombre: "Borí Borí",
     ingredientes: [
-      "Arroz para sushi",
-      "Algas nori",
-      "Pescado crudo",
-      "Verduras",
-      "Vinagre de arroz"
+      "Harina de maíz",
+      "Queso paraguay",
+      "Caldo de carne",
+      "Pollo",
+      "Zanahoria",
+      "Cebolla",
+      "Apio"
     ],
-    preparacion: "Cocinar el arroz de sushi, extenderlo sobre las algas nori, agregar pescado y verduras, y enrollar.",
-    tiempo: "45 minutos",
-    dificultad: "Alta",
-    imagen: "https://upload.wikimedia.org/wikipedia/commons/7/75/Sushi_platter.jpg",
-    pais: "Japón"
+    preparacion: "Preparar el caldo de pollo con verduras. Aparte, hacer bolitas de harina de maíz y queso. Cocinar las bolitas en el caldo hasta que estén cocidas.",
+    tiempo: "1 hora 20 minutos",
+    dificultad: "Media",
+    imagen: "https://cdn0.recetasparaguayas.com/wp-content/uploads/2020/05/Bori-Bori-receta.jpg"
   },
   {
     id: 5,
-    nombre: "Tacos",
+    nombre: "Chipa Guazú",
     ingredientes: [
-      "Tortillas de maíz",
-      "Carne molida",
+      "Maíz tierno",
+      "Queso paraguay",
+      "Leche",
+      "Huevos",
       "Cebolla",
-      "Tomate",
-      "Lechuga",
-      "Salsa"
+      "Manteca",
+      "Sal"
     ],
-    preparacion: "Cocinar la carne molida con cebolla y especias. Colocar la carne sobre las tortillas y agregar lechuga, tomate y salsa.",
-    tiempo: "30 minutos",
+    preparacion: "Licuar el maíz tierno, mezclar con queso rallado, leche, huevos batidos, cebolla rehogada y manteca. Hornear hasta dorar.",
+    tiempo: "1 hora",
     dificultad: "Fácil",
-    imagen: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Tacos_Al_Pastor.JPG",
-    pais: "México"
+    imagen: "https://media-cdn.tripadvisor.com/media/photo-s/1b/52/dc/36/chipa-guazu.jpg"
   },
   {
     id: 6,
-    nombre: "Croissant",
+    nombre: "Pira Caldo",
     ingredientes: [
-      "Harina",
-      "Mantequilla",
+      "Pescado de río",
+      "Cebolla",
+      "Tomate",
+      "Pimiento",
       "Leche",
-      "Levadura",
-      "Azúcar"
+      "Aceite",
+      "Sal",
+      "Pimienta"
     ],
-    preparacion: "Amasar la masa, enrollarla y dejar reposar. Formar los croissants y hornear.",
+    preparacion: "Rehogar cebolla, tomate y pimiento. Agregar pescado y leche. Cocinar a fuego lento hasta integrar los sabores.",
+    tiempo: "1 hora",
+    dificultad: "Media",
+    imagen: "https://www.recetasparaguayas.com/wp-content/uploads/2021/01/Pira-caldo-1024x768.jpg"
+  },
+  {
+    id: 7,
+    nombre: "Kivevé",
+    ingredientes: [
+      "Zapallo",
+      "Harina de maíz",
+      "Azúcar",
+      "Leche",
+      "Manteca"
+    ],
+    preparacion: "Cocinar el zapallo, hacer puré, agregar azúcar, harina de maíz, leche y manteca. Revolver constantemente hasta espesar.",
+    tiempo: "45 minutos",
+    dificultad: "Fácil",
+    imagen: "https://media.diariouno.com.ar/p/7cf406e2e09464b77b0fdd5ac6dcb202/adjuntos/298/imagenes/009/415/0009415862/1200x0/smart/kivevejpg.jpg"
+  },
+  {
+    id: 8,
+    nombre: "So'o apu'a",
+    ingredientes: [
+      "Carne molida",
+      "Harina de maíz",
+      "Cebolla",
+      "Huevo",
+      "Especias",
+      "Sal"
+    ],
+    preparacion: "Mezclar la carne con harina, cebolla picada, huevo y condimentos. Formar albóndigas y freír en aceite caliente.",
+    tiempo: "40 minutos",
+    dificultad: "Fácil",
+    imagen: "https://upload.wikimedia.org/wikipedia/commons/4/49/Soo_apua.jpg"
+  },
+  {
+    id: 9,
+    nombre: "Ryguasu ka'ê",
+    ingredientes: [
+      "Gallina casera",
+      "Cebolla",
+      "Pimiento",
+      "Tomate",
+      "Arroz",
+      "Especias"
+    ],
+    preparacion: "Preparar un guiso con gallina casera, cebolla, pimientos, tomate y arroz, condimentado con hierbas.",
     tiempo: "2 horas",
     dificultad: "Alta",
-    imagen: "https://upload.wikimedia.org/wikipedia/commons/a/a3/Croissants.jpg",
-    pais: "Francia"
+    imagen: "https://www.recetasparaguayas.com/wp-content/uploads/2020/05/ryguasu-kae.jpg"
+  },
+  {
+    id: 10,
+    nombre: "Soyo",
+    ingredientes: [
+      "Carne molida",
+      "Cebolla",
+      "Tomate",
+      "Caldo",
+      "Especias",
+      "Hierbas frescas"
+    ],
+    preparacion: "Machacar carne molida en el caldo hirviendo, agregar verduras picadas y cocinar hasta formar un guiso espeso.",
+    tiempo: "1 hora",
+    dificultad: "Media",
+    imagen: "https://www.recetasparaguayas.com/wp-content/uploads/2020/09/Soyo-sopa-paraguaya.jpg"
   }
 ];
 
@@ -119,21 +179,6 @@ const recetas = [
 // Obtener todas las recetas
 app.get('/recetas', (req, res) => {
   res.json(recetas);
-});
-
-// Obtener recetas filtradas por país
-app.get('/recetas/pais', (req, res) => {
-  const paisQuery = req.query.pais;
-
-  if (!paisQuery) {
-    return res.status(400).json({ error: "Debes proporcionar un país para filtrar." });
-  }
-
-  const resultados = recetas.filter(receta =>
-    receta.pais.toLowerCase().includes(paisQuery.toLowerCase())
-  );
-
-  res.json(resultados);
 });
 
 // Buscar receta por nombre
@@ -166,5 +211,5 @@ app.get('/recetas/:id', (req, res) => {
 
 // Iniciar servidor
 app.listen(PORT, () => {
-  console.log(`Servidor de recetas corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor de recetas paraguayas corriendo en http://localhost:${PORT}`);
 });

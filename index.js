@@ -43,7 +43,7 @@ const recetas = [
     preparacion: "Mezclar todos los ingredientes hasta formar una masa suave. Formar roscas y hornear hasta que estén doradas.",
     tiempo: "45 minutos",
     dificultad: "Fácil",
-    imagen: "https://es.wikipedia.org/wiki/Chipa#/media/Archivo:Chipa_Paraguay.jpg"
+    imagen: "https://paraguayrecetas.com/wp-content/uploads/2021/04/Chipa-Paraguay-1024x768.jpg"
   },
   {
     id: 3,
@@ -76,7 +76,7 @@ const recetas = [
     preparacion: "Preparar el caldo de pollo con verduras. Aparte, hacer bolitas de harina de maíz y queso. Cocinar las bolitas en el caldo hasta que estén cocidas.",
     tiempo: "1 hora 20 minutos",
     dificultad: "Media",
-    imagen: "https://es.wikipedia.org/wiki/Vor%C3%AD_vor%C3%AD#/media/Archivo:Vor%C3%AD_vor%C3%AD_paraguay.jpg"
+    imagen: "https://www.guiarepsol.com/content/dam/repsol-guia/contenidos-imagenes/comer/recetas/sopas-paraguayas/Sopa_Bori_Bori.jpg.transform/rp-rendition-lg/image.jpg?crop=89:50,smart"
   },
   {
     id: 5,

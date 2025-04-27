@@ -13,6 +13,7 @@ const recetas = [
   {
     id: 1,
     nombre: "Sopa Paraguaya",
+    pais: "Paraguay",
     ingredientes: [
       "Harina de maíz",
       "Queso paraguay",
@@ -30,6 +31,7 @@ const recetas = [
   {
     id: 2,
     nombre: "Chipa",
+    pais: "Paraguay",
     ingredientes: [
       "Almidón de mandioca",
       "Queso paraguay",
@@ -41,11 +43,12 @@ const recetas = [
     preparacion: "Mezclar todos los ingredientes hasta formar una masa suave. Formar roscas y hornear hasta que estén doradas.",
     tiempo: "45 minutos",
     dificultad: "Fácil",
-    imagen: "https://www.turismo.gov.py/wp-content/uploads/2020/03/chipa.png"
+    imagen: "https://es.wikipedia.org/wiki/Chipa#/media/Archivo:Chipa_Paraguay.jpg"
   },
   {
     id: 3,
     nombre: "Mbejú",
+    pais: "Paraguay",
     ingredientes: [
       "Almidón de mandioca",
       "Queso paraguay",
@@ -55,11 +58,12 @@ const recetas = [
     preparacion: "Mezclar el almidón, queso, grasa y sal hasta formar una mezcla arenosa. Cocinar en sartén caliente formando una tortilla.",
     tiempo: "30 minutos",
     dificultad: "Fácil",
-    imagen: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Mbeju.png"
+    imagen: "https://comidasparaguayas.com/assets/images/mbeju-mestizo_800x534.webp"
   },
   {
     id: 4,
     nombre: "Borí Borí",
+    pais: "Paraguay",
     ingredientes: [
       "Harina de maíz",
       "Queso paraguay",
@@ -72,11 +76,12 @@ const recetas = [
     preparacion: "Preparar el caldo de pollo con verduras. Aparte, hacer bolitas de harina de maíz y queso. Cocinar las bolitas en el caldo hasta que estén cocidas.",
     tiempo: "1 hora 20 minutos",
     dificultad: "Media",
-    imagen: "https://cdn0.recetasparaguayas.com/wp-content/uploads/2020/05/Bori-Bori-receta.jpg"
+    imagen: "https://es.wikipedia.org/wiki/Vor%C3%AD_vor%C3%AD#/media/Archivo:Vor%C3%AD_vor%C3%AD_paraguay.jpg"
   },
   {
     id: 5,
     nombre: "Chipa Guazú",
+    pais: "Paraguay",
     ingredientes: [
       "Maíz tierno",
       "Queso paraguay",
@@ -89,11 +94,12 @@ const recetas = [
     preparacion: "Licuar el maíz tierno, mezclar con queso rallado, leche, huevos batidos, cebolla rehogada y manteca. Hornear hasta dorar.",
     tiempo: "1 hora",
     dificultad: "Fácil",
-    imagen: "https://media-cdn.tripadvisor.com/media/photo-s/1b/52/dc/36/chipa-guazu.jpg"
+    imagen: "https://www.recetasparaguay.com/base/stock/Recipe/chipa-guazu/chipa-guazu_web.jpg.webp"
   },
   {
     id: 6,
     nombre: "Pira Caldo",
+    pais: "Paraguay",
     ingredientes: [
       "Pescado de río",
       "Cebolla",
@@ -107,11 +113,12 @@ const recetas = [
     preparacion: "Rehogar cebolla, tomate y pimiento. Agregar pescado y leche. Cocinar a fuego lento hasta integrar los sabores.",
     tiempo: "1 hora",
     dificultad: "Media",
-    imagen: "https://www.recetasparaguayas.com/wp-content/uploads/2021/01/Pira-caldo-1024x768.jpg"
+    imagen: "https://www.lactolanda.com.py/storage/images/recetas/EQUqN2IP2KKGON1jqfkvHKXf0iuI2BjVjRratBfd.png"
   },
   {
     id: 7,
     nombre: "Kivevé",
+    pais: "Paraguay",
     ingredientes: [
       "Zapallo",
       "Harina de maíz",
@@ -122,11 +129,12 @@ const recetas = [
     preparacion: "Cocinar el zapallo, hacer puré, agregar azúcar, harina de maíz, leche y manteca. Revolver constantemente hasta espesar.",
     tiempo: "45 minutos",
     dificultad: "Fácil",
-    imagen: "https://media.diariouno.com.ar/p/7cf406e2e09464b77b0fdd5ac6dcb202/adjuntos/298/imagenes/009/415/0009415862/1200x0/smart/kivevejpg.jpg"
+    imagen: "https://www.196flavors.com/wp-content/uploads/2018/05/kiveve-1.jpg"
   },
   {
     id: 8,
     nombre: "So'o apu'a",
+    pais: "Paraguay",
     ingredientes: [
       "Carne molida",
       "Harina de maíz",
@@ -138,11 +146,12 @@ const recetas = [
     preparacion: "Mezclar la carne con harina, cebolla picada, huevo y condimentos. Formar albóndigas y freír en aceite caliente.",
     tiempo: "40 minutos",
     dificultad: "Fácil",
-    imagen: "https://upload.wikimedia.org/wikipedia/commons/4/49/Soo_apua.jpg"
+    imagen: "https://img-global.cpcdn.com/recipes/4b3f61f0b6d7aa01/680x964cq70/soo-apua-foto-principal.webp"
   },
   {
     id: 9,
     nombre: "Ryguasu ka'ê",
+    pais: "Paraguay",
     ingredientes: [
       "Gallina casera",
       "Cebolla",
@@ -154,11 +163,12 @@ const recetas = [
     preparacion: "Preparar un guiso con gallina casera, cebolla, pimientos, tomate y arroz, condimentado con hierbas.",
     tiempo: "2 horas",
     dificultad: "Alta",
-    imagen: "https://www.recetasparaguayas.com/wp-content/uploads/2020/05/ryguasu-kae.jpg"
+    imagen: "https://recetas.paraguay.com/wp-content/uploads/2014/04/Ryguasu-Kae2.jpg"
   },
   {
     id: 10,
     nombre: "Soyo",
+    pais: "Paraguay",
     ingredientes: [
       "Carne molida",
       "Cebolla",
@@ -170,7 +180,7 @@ const recetas = [
     preparacion: "Machacar carne molida en el caldo hirviendo, agregar verduras picadas y cocinar hasta formar un guiso espeso.",
     tiempo: "1 hora",
     dificultad: "Media",
-    imagen: "https://www.recetasparaguayas.com/wp-content/uploads/2020/09/Soyo-sopa-paraguaya.jpg"
+    imagen: "https://micorazondearroz.com/wp-content/uploads/2024/01/DSC09747-2024x2048.jpg"
   }
 ];
 

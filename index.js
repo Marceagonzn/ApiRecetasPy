@@ -25,7 +25,7 @@ const recetas = [
     preparacion: "Batir los huevos, agregar la harina de maíz, queso rallado, leche, cebolla rehogada en manteca y sal. Mezclar todo y hornear a temperatura media hasta dorar.",
     tiempo: "1 hora",
     dificultad: "Fácil",
-    imagen: "https://cdn0.recetasparaguayas.com/wp-content/uploads/2020/04/Sopa-paraguaya-receta.jpg"
+    imagen: "https://www.abc.com.py/resizer/v2/CZDFE2LPZFCMHA2AB7Q33LZ2QE.jpg?auth=0e743a6da013e29b6ec7a364d7ed2a27acba2b8d9c12aa1c3fc715a05f126b26&width=770&smart=true"
   },
   {
     id: 2,

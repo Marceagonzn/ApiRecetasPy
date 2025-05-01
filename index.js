@@ -3,46 +3,56 @@ import cors from 'cors';
 import pool from './db.js';
 
 const app = express();
+
+// Configuración de puerto y host para producción
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
 
-// Configuración de middlewares (IMPORTANTE: Deben ir primero)
+// Middlewares esenciales (DEBEN IR PRIMERO)
 app.use(cors({
-  origin: '*', // Cambia esto en producción a tu dominio específico
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://tudominio.com' 
+    : '*',
   methods: ['GET', 'OPTIONS']
 }));
 app.use(express.json());
 
+// Logging de solicitudes
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
 // Health Check mejorado
 app.get('/healthcheck', async (req, res) => {
   try {
-    await pool.query('SELECT 1');
+    const dbCheck = await pool.query('SELECT COUNT(*) FROM recetas');
     res.json({
       status: 'healthy',
       db: 'connected',
-      environment: process.env.NODE_ENV || 'development',
-      timestamp: new Date().toISOString()
+      recetas_count: dbCheck.rows[0].count,
+      environment: process.env.NODE_ENV || 'development'
     });
   } catch (err) {
-    console.error('❌ Healthcheck failed:', err);
+    console.error('❌ Healthcheck DB Error:', err);
     res.status(500).json({
       status: 'unhealthy',
-      error: err.message
+      error: 'Database connection failed'
     });
   }
 });
 
-// Endpoint GET /recetas (VERSIÓN DEFINITIVA)
+// Endpoint GET /recetas (Versión Final)
 app.get('/recetas', async (req, res) => {
   try {
-    console.log('🔍 Iniciando consulta de recetas...');
+    console.log('📡 Consultando recetas...');
     
     const { rows } = await pool.query(`
       SELECT 
         id,
         nombre,
         pais,
-        COALESCE(ingredientes::text, '[]') AS ingredientes,
+        COALESCE(ingredientes::jsonb, '[]'::jsonb) AS ingredientes,
         COALESCE(preparacion, '') AS preparacion,
         COALESCE(tiempo, '') AS tiempo,
         COALESCE(dificultad, 'Media') AS dificultad,
@@ -51,62 +61,66 @@ app.get('/recetas', async (req, res) => {
       ORDER BY id ASC
     `);
 
-    if (!rows || rows.length === 0) {
-      console.warn('⚠️ Consulta exitosa pero 0 recetas encontradas');
-      return res.status(200).json({
-        success: true,
-        count: 0,
-        message: 'No hay recetas disponibles',
-        data: []
+    if (!rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'No se encontraron recetas'
       });
     }
 
-    // Convertir ingredientes de string JSON a objeto
-    const formattedRows = rows.map(row => ({
-      ...row,
-      ingredientes: JSON.parse(row.ingredientes)
-    }));
-
-    console.log(`✅ ${formattedRows.length} recetas obtenidas`);
-    
-    res.status(200).json({
+    console.log(`✅ Enviando ${rows.length} recetas`);
+    res.json({
       success: true,
-      count: formattedRows.length,
-      data: formattedRows
+      count: rows.length,
+      data: rows
     });
 
   } catch (error) {
-    console.error('❌ Error en GET /recetas:', {
+    console.error('💥 Error en /recetas:', {
       message: error.message,
-      stack: error.stack
+      stack: error.stack.split('\n')[0]
     });
     
     res.status(500).json({
       success: false,
-      error: 'Error al obtener recetas',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: 'Error interno al obtener recetas'
     });
   }
 });
 
-// Ruta de ejemplo adicional
+// Ruta raíz
 app.get('/', (req, res) => {
-  res.send('API de Recetas Paraguayas 🚀');
+  res.send(`
+    <h1>API de Recetas Paraguayas</h1>
+    <ul>
+      <li><a href="/healthcheck">Health Check</a></li>
+      <li><a href="/recetas">Listado de Recetas</a></li>
+    </ul>
+  `);
 });
 
-// Manejo de errores global
+// Manejo de errores
 app.use((err, req, res, next) => {
-  console.error('🔥 Error no manejado:', err);
-  res.status(500).json({ 
-    success: false,
-    error: 'Error interno del servidor'
-  });
+  console.error('🔥 Error no capturado:', err);
+  res.status(500).json({ error: 'Error interno del servidor' });
 });
 
 // Inicio del servidor
-app.listen(PORT, HOST, () => {
-  console.log(`🚀 Servidor escuchando en http://${HOST}:${PORT}`);
-  console.log(`• Entorno: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`• Healthcheck: http://${HOST}:${PORT}/healthcheck`);
-  console.log(`• Endpoint recetas: http://${HOST}:${PORT}/recetas`);
+const server = app.listen(PORT, HOST, () => {
+  console.log(`
+  🚀 Servidor activo en http://${HOST}:${PORT}
+  ├─ Entorno: ${process.env.NODE_ENV || 'development'}
+  ├─ Healthcheck: /healthcheck
+  └─ Endpoint Recetas: /recetas
+  `);
+});
+
+// Manejo de cierre
+process.on('SIGTERM', () => {
+  console.log('🛑 Recibida señal de terminación');
+  server.close(() => {
+    console.log('👋 Servidor cerrado');
+    pool.end();
+    process.exit(0);
+  });
 });

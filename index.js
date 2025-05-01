@@ -5,20 +5,6 @@ import pool from './db.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Endpoint GET /recetas
-app.get('/recetas', async (req, res) => {
-  try {
-    const { rows } = await pool.query('SELECT * FROM recetas');
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.listen(3000, () => {
-  console.log('🚀 API escuchando en puerto 3000');
-});
-
 // Configuración mejorada
 app.use(cors());
 app.use(express.json());

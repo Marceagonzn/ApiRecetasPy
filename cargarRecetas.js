@@ -1,43 +1,57 @@
-import { config } from "dotenv";
-import pg from "pg";
-import fs from "fs";
+import { Pool } from 'pg';
+import fs from 'fs/promises';
+import { config } from 'dotenv';
 
 config();
 
-const { Pool } = pg;
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL + "?sslmode=require",
-  ssl: { rejectUnauthorized: false }
+  connectionString: 'postgresql://postgres:FfSTbRBsqEZKodCAREjPCPpAsLKTvaJh@hopper.proxy.rlwy.net:48766/railway?sslmode=no-verify',
+  ssl: {
+    rejectUnauthorized: false,
+    sslfactory: "org.postgresql.ssl.NonValidatingFactory"
+  },
+  connectionTimeoutMillis: 15000, // 15 segundos de timeout
+  idleTimeoutMillis: 30000
 });
 
-const recetas = JSON.parse(fs.readFileSync("recetas.json", "utf8"));
-
 async function cargarRecetas() {
+  const client = await pool.connect();
   try {
-    await pool.query('BEGIN'); // Inicia transacción
+    const data = await fs.readFile('recetas.json', 'utf8');
+    const recetas = JSON.parse(data);
 
-    for (const receta of recetas) {
-      await pool.query(
-        `INSERT INTO recetas (nombre, pais, ingredientes, preparacion, tiempo, dificultad, imagen)
-         VALUES ($1, $2, $3::jsonb, $4, $5, $6, $7)`, // Conversión explícita a jsonb
-        [
-          receta.nombre,
-          receta.pais,
-          JSON.stringify(receta.ingredientes), // Convierte el array a string JSON
-          receta.preparacion,
-          receta.tiempo,
-          receta.dificultad,
-          receta.imagen
-        ]
-      );
+    await client.query('BEGIN');
+    
+    for (const [i, receta] of recetas.entries()) {
+      try {
+        await client.query(
+          `INSERT INTO recetas 
+          (nombre, pais, ingredientes, preparacion, tiempo, dificultad, imagen)
+          VALUES ($1, $2, $3::jsonb, $4, $5, $6, $7)`,
+          [
+            receta.nombre,
+            receta.pais,
+            JSON.stringify(receta.ingredientes),
+            receta.preparacion,
+            receta.tiempo,
+            receta.difficulty || 'Media', // Valor por defecto si no existe
+            receta.imagen
+          ]
+        );
+        console.log(`✅ Receta ${i+1}/${recetas.length} insertada`);
+      } catch (error) {
+        console.error(`❌ Error en receta "${receta.nombre}":`, error.message);
+        continue;
+      }
     }
-
-    await pool.query('COMMIT');
-    console.log("✅ Recetas cargadas con éxito");
+    
+    await client.query('COMMIT');
+    console.log('🎉 Todas las recetas se cargaron correctamente');
   } catch (error) {
-    await pool.query('ROLLBACK');
-    console.error("❌ Error al cargar recetas:", error.message);
+    await client.query('ROLLBACK');
+    console.error('🔥 Error crítico:', error);
   } finally {
+    client.release();
     await pool.end();
   }
 }

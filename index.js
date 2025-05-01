@@ -1,69 +1,41 @@
-import express from 'express';
-import cors from 'cors';
-import pool from './db.js';
+import express from "express";
+import cors from "cors";
+import pool from "./db.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuración esencial (DEBE IR PRIMERO)
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // para leer JSON
 
-// Middleware de logs para todas las peticiones
-app.use((req, res, next) => {
-  console.log(`📥 ${req.method} ${req.path}`);
-  next();
-});
-
-// Ruta de prueba básica
-app.get('/healthcheck', (req, res) => {
-  res.status(200).json({ 
-    status: 'healthy',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Ruta principal de recetas
-app.get('/recetas', async (req, res) => {
+// Ruta para obtener todas las recetas
+app.get("/recetas", async (req, res) => {
   try {
-    console.log('🔍 Ejecutando query para obtener recetas...');
-    const { rows } = await pool.query('SELECT * FROM recetas');
-    console.log(`✅ Encontradas ${rows.length} recetas`);
-    
-    res.status(200).json({
-      success: true,
-      count: rows.length,
-      data: rows
-    });
+    const result = await pool.query("SELECT * FROM recetas");
+    res.json(result.rows);
   } catch (error) {
-    console.error('❌ Error en GET /recetas:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Error al obtener recetas'
-    });
+    console.error("Error al obtener recetas:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
-// Manejo de errores centralizado
-app.use((err, req, res, next) => {
-  console.error('🔥 Error no manejado:', err);
-  res.status(500).json({ error: 'Error interno del servidor' });
+// Ruta para agregar una nueva receta
+app.post("/recetas", async (req, res) => {
+  const { nombre, pais, ingredientes, preparacion, tiempo, dificultad, imagen } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO recetas (nombre, pais, ingredientes, preparacion, tiempo, dificultad, imagen)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [nombre, pais, ingredientes, preparacion, tiempo, dificultad, imagen]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error al crear receta:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
 });
 
-// Iniciar servidor
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Servidor escuchando en puerto ${PORT}`);
-});
-
-// Manejo de cierre adecuado
-process.on('SIGTERM', () => {
-  console.log('🛑 Recibido SIGTERM. Cerrando servidor...');
-  server.close(() => {
-    console.log('👋 Servidor cerrado');
-    process.exit(0);
-  });
-});
-
-process.on('unhandledRejection', (err) => {
-  console.error('⚠️ Unhandled Rejection:', err);
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

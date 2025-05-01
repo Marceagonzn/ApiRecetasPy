@@ -5,13 +5,8 @@ import { config } from 'dotenv';
 config();
 
 const pool = new Pool({
-  connectionString: 'postgresql://postgres:FfSTbRBsqEZKodCAREjPCPpAsLKTvaJh@hopper.proxy.rlwy.net:48766/railway?sslmode=no-verify',
-  ssl: {
-    rejectUnauthorized: false,
-    sslfactory: "org.postgresql.ssl.NonValidatingFactory"
-  },
-  connectionTimeoutMillis: 15000, // 15 segundos de timeout
-  idleTimeoutMillis: 30000
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
 });
 
 async function cargarRecetas() {

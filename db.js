@@ -1,13 +1,20 @@
-import pg from "pg";
-import { config } from "dotenv";
+import { Pool } from 'pg';
+import { config } from 'dotenv';
 
-config(); // Carga las variables de entorno
+// Cargar variables de entorno
+config();
 
-const { Pool } = pg;
-
+// Configuración de la conexión
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  connectionString: process.env.DATABASE_URL, // Usará la variable de Railway en producción
+  ssl: {
+    rejectUnauthorized: false // Necesario para Railway
+  }
 });
+
+// Verificación de conexión (opcional pero recomendado)
+pool.query('SELECT NOW()')
+  .then(() => console.log('✅ Conexión a PostgreSQL exitosa'))
+  .catch(err => console.error('❌ Error de conexión:', err));
 
 export default pool;

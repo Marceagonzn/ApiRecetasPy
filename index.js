@@ -5,57 +5,65 @@ import pool from './db.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuración de middleware (DEBE IR AL INICIO)
-app.use(cors({
-  origin: '*' // O especifica tu dominio frontend ej: 'https://tufrontend.com'
-}));
+// Configuración esencial (DEBE IR PRIMERO)
+app.use(cors());
 app.use(express.json());
 
-// Verificación de conexión a DB y rutas
-const startServer = async () => {
+// Middleware de logs para todas las peticiones
+app.use((req, res, next) => {
+  console.log(`📥 ${req.method} ${req.path}`);
+  next();
+});
+
+// Ruta de prueba básica
+app.get('/healthcheck', (req, res) => {
+  res.status(200).json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Ruta principal de recetas
+app.get('/recetas', async (req, res) => {
   try {
-    // Testear conexión a DB
-    await pool.query('SELECT 1');
-    console.log('✅ Conexión a PostgreSQL verificada');
-
-    // Ruta de prueba
-    app.get('/', (req, res) => {
-      res.send('API de Recetas Paraguayas 🚀');
+    console.log('🔍 Ejecutando query para obtener recetas...');
+    const { rows } = await pool.query('SELECT * FROM recetas');
+    console.log(`✅ Encontradas ${rows.length} recetas`);
+    
+    res.status(200).json({
+      success: true,
+      count: rows.length,
+      data: rows
     });
-
-    // Ruta GET /recetas MEJORADA
-    app.get('/recetas', async (req, res) => {
-      try {
-        console.log('📦 Intentando obtener recetas...'); // Log de depuración
-        const { rows } = await pool.query('SELECT * FROM recetas');
-        console.log(`✅ Encontradas ${rows.length} recetas`); // Log de depuración
-        
-        // Asegurar formato de respuesta
-        res.status(200).json({
-          success: true,
-          count: rows.length,
-          data: rows
-        });
-      } catch (err) {
-        console.error('❌ Error en GET /recetas:', err);
-        res.status(500).json({ 
-          success: false,
-          error: 'Error al obtener recetas',
-          details: process.env.NODE_ENV === 'development' ? err.message : undefined
-        });
-      }
+  } catch (error) {
+    console.error('❌ Error en GET /recetas:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al obtener recetas'
     });
-
-    // Iniciar servidor
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Servidor escuchando en puerto ${PORT}`);
-      console.log(`🔗 URL: http://localhost:${PORT}`);
-    });
-
-  } catch (dbError) {
-    console.error('❌ Error crítico de conexión a DB:', dbError);
-    process.exit(1);
   }
-};
+});
 
-startServer();
+// Manejo de errores centralizado
+app.use((err, req, res, next) => {
+  console.error('🔥 Error no manejado:', err);
+  res.status(500).json({ error: 'Error interno del servidor' });
+});
+
+// Iniciar servidor
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Servidor escuchando en puerto ${PORT}`);
+});
+
+// Manejo de cierre adecuado
+process.on('SIGTERM', () => {
+  console.log('🛑 Recibido SIGTERM. Cerrando servidor...');
+  server.close(() => {
+    console.log('👋 Servidor cerrado');
+    process.exit(0);
+  });
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('⚠️ Unhandled Rejection:', err);
+});

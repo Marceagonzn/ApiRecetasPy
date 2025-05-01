@@ -6,7 +6,7 @@ config(); // Carga las variables de entorno
 const { Pool } = pg;
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL + "?sslmode=require", // ← Añade esto
   ssl: { rejectUnauthorized: false }
 });
 

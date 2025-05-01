@@ -1,104 +1,74 @@
 import express from 'express';
 import cors from 'cors';
-import { Pool } from 'pg';
+import pool from './db.js';
 
-// Configuración 100% compatible con Railway
 const app = express();
 const PORT = process.env.PORT || 8080;
-const HOST = '0.0.0.0';
+const HOST = '0.0.0.0'; // Obligatorio para producción
 
-// Conexión a DB con manejo de errores extremo
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-    sslmode: 'require'
-  },
-  idleTimeoutMillis: 10000,
-  connectionTimeoutMillis: 5000
+// 1. Middlewares esenciales (DEBEN ir primero)
+app.use(cors());
+app.use(express.json());
+
+// 2. Ruta raíz OBLIGATORIA
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: "Bienvenido a la API de Recetas",
+    endpoints: {
+      healthcheck: "/healthcheck",
+      recetas: "/recetas"
+    },
+    status: "active"
+  });
 });
 
-// Middlewares con protección máxima
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS']
-}));
-app.use(express.json({ limit: '10mb' }));
-
-// Healthcheck de nivel militar
+// 3. Healthcheck mejorado
 app.get('/healthcheck', async (req, res) => {
   try {
-    const dbResult = await pool.query('SELECT NOW()');
+    await pool.query('SELECT 1');
     res.json({
-      status: 'OPERATIONAL',
-      database: dbResult.rows[0].now,
-      serverTime: new Date(),
-      environment: process.env.NODE_ENV || 'development'
+      status: 'online',
+      database: 'connected',
+      timestamp: new Date().toISOString()
     });
-  } catch (dbError) {
-    console.error('‼️ Critical DB Failure:', dbError);
-    res.status(503).json({
-      status: 'DATABASE_FAILURE',
-      error: dbError.message
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      error: err.message
     });
   }
 });
 
-// Endpoint de recetas a prueba de balas
+// 4. Endpoint de recetas
 app.get('/recetas', async (req, res) => {
   try {
-    console.log('🔍 Iniciando consulta a DB...');
-    const startTime = Date.now();
-    
-    const { rows } = await pool.query(`
-      SELECT * FROM recetas 
-      ORDER BY id ASC
-      LIMIT 100  -- Prevención de sobrecarga
-    `);
-
-    const duration = Date.now() - startTime;
-    console.log(`✅ Consulta exitosa (${duration}ms): ${rows.length} recetas`);
-
+    const { rows } = await pool.query('SELECT * FROM recetas');
     res.json({
-      status: 'SUCCESS',
-      executionTime: `${duration}ms`,
+      success: true,
       count: rows.length,
       data: rows
     });
-
-  } catch (error) {
-    console.error('💥 EXPLOSION EN /recetas:', {
-      error: error.message,
-      stack: error.stack.split('\n')[0],
-      timestamp: new Date()
-    });
-
+  } catch (err) {
     res.status(500).json({
-      status: 'SYSTEM_FAILURE',
-      errorCode: 'RECETAS_QUERY_FAILED',
-      timestamp: new Date().toISOString()
+      success: false,
+      error: err.message
     });
   }
 });
 
-// Inicio del servidor con triple verificación
-const server = app.listen(PORT, HOST, () => {
+// 5. Manejo de rutas no existentes (DEBE ir al final)
+app.use((req, res) => {
+  res.status(404).json({
+    error: "Ruta no encontrada",
+    rutas_validas: ["/", "/healthcheck", "/recetas"]
+  });
+});
+
+// 6. Inicio del servidor
+app.listen(PORT, HOST, () => {
   console.log(`
-  🚀 BOLT SERVER RUNNING
-  ├─ Port: ${PORT}
-  ├─ Env: ${process.env.NODE_ENV || 'development'}
-  ├─ DB: ${process.env.DATABASE_URL ? 'CONFIGURED' : 'MISSING!'}
-  └─ Ready: http://${HOST}:${PORT}/healthcheck
+  🚀 Servidor funcionando en http://${HOST}:${PORT}
+  ├─ Healthcheck: http://${HOST}:${PORT}/healthcheck
+  └─ Recetas: http://${HOST}:${PORT}/recetas
   `);
-});
-
-// Manejo de errores catastróficos
-process.on('unhandledRejection', (err) => {
-  console.error('☢️ UNHANDLED REJECTION:', err);
-  process.exit(1);
-});
-
-server.on('error', (err) => {
-  console.error('💣 SERVER ERROR:', err);
-  process.exit(1);
 });

@@ -1,41 +1,34 @@
-import express from "express";
-import cors from "cors";
-import pool from "./db.js";
+import express from 'express';
+import cors from 'cors';
+import pool from './db.js';
 
 const app = express();
+
+// Configuración de puerto para Railway
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
 
+// Middlewares
 app.use(cors());
-app.use(express.json()); // para leer JSON
+app.use(express.json());
 
-// Ruta para obtener todas las recetas
-app.get("/recetas", async (req, res) => {
+// Health Check
+app.get('/healthcheck', async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM recetas");
-    res.json(result.rows);
-  } catch (error) {
-    console.error("Error al obtener recetas:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    await pool.query('SELECT 1');
+    res.json({ 
+      status: 'healthy',
+      environment: process.env.NODE_ENV || 'development'
+    });
+  } catch (err) {
+    res.status(500).json({ status: 'unhealthy', error: err.message });
   }
 });
 
-// Ruta para agregar una nueva receta
-app.post("/recetas", async (req, res) => {
-  const { nombre, pais, ingredientes, preparacion, tiempo, dificultad, imagen } = req.body;
+// Resto de tus rutas...
 
-  try {
-    const result = await pool.query(
-      `INSERT INTO recetas (nombre, pais, ingredientes, preparacion, tiempo, dificultad, imagen)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [nombre, pais, ingredientes, preparacion, tiempo, dificultad, imagen]
-    );
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error("Error al crear receta:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
-  }
-});
-
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+// Inicio del servidor
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 Servidor corriendo en http://${HOST}:${PORT}`);
+  console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`);
 });
